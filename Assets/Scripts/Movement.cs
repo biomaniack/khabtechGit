@@ -5,8 +5,8 @@ public class Movement : MonoBehaviour
 {
 
     public int countUnit, cnUnit;
-    public float size, ted2;
-    Vector2 posC, posC2;    
+    public float size, ted2,fx, fy,fz =1;
+    public Vector2 posC, posC2, vtext, vtext2;    
   
     public GameObject Unit, clone;
 
@@ -14,19 +14,38 @@ public class Movement : MonoBehaviour
 
     public Vector3 Origposition, pos0, pos1, pos2, pos3, pos4;
     
-
+   
     void OnGUI()
     {
-        GUI.Label(new Rect(posC.x, Screen.height - posC.y - 20, 100, 20), gameObject.name + ": " + countUnit);
+        if (countUnit < 10)
+        {
+            fx = 3;
+            fy = 20;
+        }
+        if (countUnit >= 10)
+        {
+            fx = 5;
+            fy = 20;
+        }
+        if (countUnit >= 10)
+        {
+            fx = 7;
+            fy = 20;
+        }
+        GUI.Label(new Rect(posC.x-fx ,Screen.height - posC.y-fy , 100, 20), countUnit.ToString());
     }
-
+    void Start()
+    {
+      
+       
+    }
     void Awake()
     {
         cnUnit = 0;
-        posC2 = transform.position;
-        posC2.x += 0.5f;
-        posC2.y += 0.5f;
-        posC = Camera.main.WorldToScreenPoint(posC2);
+      
+        
+       
+
     }
 
     public virtual void CreateUnit(GameObject UnitE)
@@ -38,6 +57,7 @@ public class Movement : MonoBehaviour
             if (collider2D == Physics2D.OverlapPoint(touchPos))
             {
                 Origposition = transform.position;
+              
                 colOn = true;
             }
         }
@@ -60,7 +80,7 @@ public class Movement : MonoBehaviour
     public IEnumerator goWaits(GameObject UnitE2, RaycastHit2D hit2, int countUnit2)
     {
         float Angle = -20;
-        Origposition.z = -5;
+        Origposition.z = 5;
         pos4 = GameObject.Find(hit2.collider.gameObject.name).transform.position;
         for (int i = 1; i <= countUnit2; i++)
         {
@@ -81,12 +101,12 @@ public class Movement : MonoBehaviour
             clone.GetComponent<PathFind>().pos3 = pos3;
             clone.GetComponent<PathFind>().pos4 = pos4;
             Angle += 10;
-            Origposition.z++;
+            Origposition.z = Origposition.z + 1 * fz;
 
             int dig = i % 5;
             if (dig == 0)
             {
-                Origposition.z = -5;
+                Origposition.z = 5;
                 Angle = -20;
                 yield return new WaitForSeconds(0.3f);
             }
@@ -112,7 +132,10 @@ public class Movement : MonoBehaviour
 
         c_angle = Mathf.Atan2(cV.y, cV.x) * Mathf.Rad2Deg;
 
-        if (c_angle < 70 && c_angle > -70 && type == 2) { p1.z *= (-1); p4.z *= (-1); pos1.z *= (-1); pos4.z *= (-1); }
+        if (c_angle < 70 && c_angle > -70 && type == 2) {
+            //p1.z *= (-1); p4.z *= (-1); pos1.z *= (-1); pos4.z *= (-1);
+            fz = -1;
+        }
         switch (type)
         {
             case 2:
@@ -134,12 +157,18 @@ public class Movement : MonoBehaviour
     }
     void FixedUpdate()
     {
+        posC2 = GameObject.Find("cnUnit_" + gameObject.name).transform.position;
+
+      
+        posC = Camera.main.WorldToScreenPoint(posC2);
+
         if (countUnit < 100)
         {
             ted2++;
         }
 
         countUnit = (int)ted2 / 100;
+      
         CreateUnit(Unit);
     }
 }
